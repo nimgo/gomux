@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be found
 // in the LICENSE file.
 
-package httprouter
+package nimux
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ import (
 )
 
 func printChildren(n *node, prefix string) {
-	fmt.Printf(" %02d:%02d %s%s[%d] %v %t %d \r\n", n.priority, n.maxParams, prefix, n.path, len(n.children), n.handle, n.wildChild, n.nType)
+	fmt.Printf(" %02d:%02d %s%s[%d] %v %t %d \r\n", n.priority, n.maxParams, prefix, n.path, len(n.children), n.handlerFunc, n.wildChild, n.nType)
 	for l := len(n.path); l > 0; l-- {
 		prefix += " "
 	}
@@ -26,8 +26,8 @@ func printChildren(n *node, prefix string) {
 // Used as a workaround since we can't compare functions or their addresses
 var fakeHandlerValue string
 
-func fakeHandler(val string) Handle {
-	return func(http.ResponseWriter, *http.Request, Params) {
+func fakeHandler(val string) http.HandlerFunc {
+	return func(http.ResponseWriter, *http.Request) {
 		fakeHandlerValue = val
 	}
 }
@@ -41,16 +41,16 @@ type testRequests []struct {
 
 func checkRequests(t *testing.T, tree *node, requests testRequests) {
 	for _, request := range requests {
-		handler, ps, _ := tree.getValue(request.path)
+		handlerFunc, ps, _ := tree.getValue(request.path)
 
-		if handler == nil {
+		if handlerFunc == nil {
 			if !request.nilHandler {
 				t.Errorf("handle mismatch for route '%s': Expected non-nil handle", request.path)
 			}
 		} else if request.nilHandler {
 			t.Errorf("handle mismatch for route '%s': Expected nil handle", request.path)
 		} else {
-			handler(nil, nil, nil)
+			handlerFunc(nil, nil)
 			if fakeHandlerValue != request.route {
 				t.Errorf("handle mismatch for route '%s': Wrong handle (%s != %s)", request.path, fakeHandlerValue, request.route)
 			}
@@ -68,7 +68,7 @@ func checkPriorities(t *testing.T, n *node) uint32 {
 		prio += checkPriorities(t, n.children[i])
 	}
 
-	if n.handle != nil {
+	if n.handlerFunc != nil {
 		prio++
 	}
 
@@ -433,8 +433,8 @@ func TestTreeTrailingSlashRedirect(t *testing.T) {
 		"/doc/",
 	}
 	for _, route := range tsrRoutes {
-		handler, _, tsr := tree.getValue(route)
-		if handler != nil {
+		handlerFunc, _, tsr := tree.getValue(route)
+		if handlerFunc != nil {
 			t.Fatalf("non-nil handler for TSR route '%s", route)
 		} else if !tsr {
 			t.Errorf("expected TSR recommendation for route '%s'", route)
@@ -450,9 +450,9 @@ func TestTreeTrailingSlashRedirect(t *testing.T) {
 		"/api/world/abc",
 	}
 	for _, route := range noTsrRoutes {
-		handler, _, tsr := tree.getValue(route)
-		if handler != nil {
-			t.Fatalf("non-nil handler for No-TSR route '%s", route)
+		handlerFunc, _, tsr := tree.getValue(route)
+		if handlerFunc != nil {
+			t.Fatalf("non-nil handlerFunc for No-TSR route '%s", route)
 		} else if tsr {
 			t.Errorf("expected no TSR recommendation for route '%s'", route)
 		}
@@ -469,8 +469,8 @@ func TestTreeRootTrailingSlashRedirect(t *testing.T) {
 		t.Fatalf("panic inserting test route: %v", recv)
 	}
 
-	handler, _, tsr := tree.getValue("/")
-	if handler != nil {
+	handlerFunc, _, tsr := tree.getValue("/")
+	if handlerFunc != nil {
 		t.Fatalf("non-nil handler")
 	} else if tsr {
 		t.Errorf("expected no TSR recommendation")
