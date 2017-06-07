@@ -37,7 +37,7 @@ func main() {
 
 func flush(msg string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ps := nimux.GetHttpParams(r)
+		ps := nimux.GetMuxParams(r)
 		fmt.Fprintf(w, msg+" ...."+ps.ByName("watch"))
 	}
 }

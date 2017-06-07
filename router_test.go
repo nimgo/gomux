@@ -50,7 +50,7 @@ func TestRouter(t *testing.T) {
 
 	routed := false
 	router.HandlerFunc("GET", "/user/:name", func(w http.ResponseWriter, r *http.Request) {
-		ps := GetHttpParams(r)
+		ps := GetMuxParams(r)
 		routed = true
 		want := &Params{Param{"name", "gopher"}}
 		if !reflect.DeepEqual(ps, want) {

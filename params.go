@@ -5,9 +5,8 @@ package nimux
 */
 
 import (
+	"context"
 	"net/http"
-
-	gorilla "github.com/gorilla/context"
 )
 
 // Param is a single URL parameter, consisting of a key and a value.
@@ -36,16 +35,16 @@ func (ps Params) ByName(name string) string {
 	return ""
 }
 
-// GetParams
-func GetHttpParams(r *http.Request) *Params {
-	if ps, ok := gorilla.GetOk(r, paramsKey); ok {
+// GetMuxParams returns the mux params
+func GetMuxParams(r *http.Request) *Params {
+	if ps := r.Context().Value(paramsKey); ps != nil {
 		return ps.(*Params)
 	}
 	return &Params{}
 }
 
-// SetParams
-func setHttpParams(r *http.Request, ps *Params) {
-	gorilla.Set(r, paramsKey, ps)
-
+// setMuxParams saves mux params to the context
+func setMuxParams(r *http.Request, ps *Params) *http.Request {
+	ctx := context.WithValue(r.Context(), paramsKey, ps)
+	return r.WithContext(ctx)
 }

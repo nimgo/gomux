@@ -233,7 +233,7 @@ func (r *Router) ServeFiles(path string, root http.FileSystem) {
 	fileServer := http.FileServer(root)
 
 	r.GET(path, func(w http.ResponseWriter, req *http.Request) {
-		ps := GetHttpParams(req)
+		ps := GetMuxParams(req)
 		req.URL.Path = ps.ByName("filepath")
 		fileServer.ServeHTTP(w, req)
 	})
@@ -305,7 +305,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	if root := r.trees[req.Method]; root != nil {
 		if handlerFunc, ps, tsr := root.getValue(path); handlerFunc != nil {
-			setHttpParams(req, &ps)
+			req = setMuxParams(req, &ps)
 			handlerFunc(w, req)
 			return
 		} else if req.Method != "CONNECT" && path != "/" {
