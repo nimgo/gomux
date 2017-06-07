@@ -2,10 +2,11 @@ package nimux
 
 /*
  Temporary use of gorilla/context until Go1.7 is out
- */
+*/
 
 import (
 	"net/http"
+
 	gorilla "github.com/gorilla/context"
 )
 
@@ -16,6 +17,7 @@ type Param struct {
 }
 
 type key int
+
 const paramsKey key = 0
 
 // Params is a Param-slice, as returned by the router.
@@ -45,4 +47,5 @@ func GetHttpParams(r *http.Request) *Params {
 // SetParams
 func setHttpParams(r *http.Request, ps *Params) {
 	gorilla.Set(r, paramsKey, ps)
+
 }

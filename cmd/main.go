@@ -29,7 +29,7 @@ func main() {
 
 	mux.GET("/auth/*sub", sub.ServeHTTP)
 
-	n := nim.Default()
+	n := nim.New()
 	n.With(mux)
 
 	nim.Run(n, ":3000")
@@ -37,9 +37,8 @@ func main() {
 
 func flush(msg string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, msg)
 		ps := nimux.GetHttpParams(r)
-		fmt.Println("...." + ps.ByName("watch"))
+		fmt.Fprintf(w, msg+" ...."+ps.ByName("watch"))
 	}
 }
 
