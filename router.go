@@ -1,4 +1,6 @@
-// Copyright 2013 Julien Schmidt. All rights reserved.
+// Copyright 2017 Jave Tann. All rights reserved.
+// Based on the copyright 2013 Julien Schmidt. All rights reserved.
+// Based on the path package, Copyright 2009 The Go Authors.
 // Use of this source code is governed by a BSD-style license that can be found
 // in the LICENSE file.
 
@@ -74,7 +76,7 @@
 //  // by the index of the parameter. This way you can also get the name (key)
 //  thirdKey   := ps[2].Key   // the name of the 3rd parameter
 //  thirdValue := ps[2].Value // the value of the 3rd parameter
-package nimux
+package gomux
 
 import (
 	"net/http"
@@ -150,40 +152,40 @@ func New() *Router {
 
 // GET is a shortcut for router.Handle("GET", path, handlerFunc)
 func (r *Router) GET(path string, handlerFunc http.HandlerFunc) {
-	r.HandlerFunc("GET", path, handlerFunc)
+	r.HandleFunc("GET", path, handlerFunc)
 }
 
 // HEAD is a shortcut for router.Handle("HEAD", path, handlerFunc)
 func (r *Router) HEAD(path string, handlerFunc http.HandlerFunc) {
-	r.HandlerFunc("HEAD", path, handlerFunc)
+	r.HandleFunc("HEAD", path, handlerFunc)
 }
 
 // OPTIONS is a shortcut for router.Handle("OPTIONS", path, handlerFunc)
 func (r *Router) OPTIONS(path string, handlerFunc http.HandlerFunc) {
-	r.HandlerFunc("OPTIONS", path, handlerFunc)
+	r.HandleFunc("OPTIONS", path, handlerFunc)
 }
 
 // POST is a shortcut for router.Handle("POST", path, handlerFunc)
 func (r *Router) POST(path string, handlerFunc http.HandlerFunc) {
-	r.HandlerFunc("POST", path, handlerFunc)
+	r.HandleFunc("POST", path, handlerFunc)
 }
 
 // PUT is a shortcut for router.Handle("PUT", path, handlerFunc)
 func (r *Router) PUT(path string, handlerFunc http.HandlerFunc) {
-	r.HandlerFunc("PUT", path, handlerFunc)
+	r.HandleFunc("PUT", path, handlerFunc)
 }
 
 // PATCH is a shortcut for router.Handle("PATCH", path, handlerFunc)
 func (r *Router) PATCH(path string, handlerFunc http.HandlerFunc) {
-	r.HandlerFunc("PATCH", path, handlerFunc)
+	r.HandleFunc("PATCH", path, handlerFunc)
 }
 
 // DELETE is a shortcut for router.Handle("DELETE", path, handlerFunc)
 func (r *Router) DELETE(path string, handlerFunc http.HandlerFunc) {
-	r.HandlerFunc("DELETE", path, handlerFunc)
+	r.HandleFunc("DELETE", path, handlerFunc)
 }
 
-// HandlerFunc registers a new request handle with the given path and method.
+// HandleFunc registers a new request handle with the given path and method.
 //
 // For GET, POST, PUT, PATCH and DELETE requests the respective shortcut
 // functions can be used.
@@ -191,7 +193,7 @@ func (r *Router) DELETE(path string, handlerFunc http.HandlerFunc) {
 // This function is intended for bulk loading and to allow the usage of less
 // frequently used, non-standardized or custom methods (e.g. for internal
 // communication with a proxy).
-func (r *Router) HandlerFunc(method, path string, handlerFunc http.HandlerFunc) {
+func (r *Router) HandleFunc(method, path string, handlerFunc http.HandlerFunc) {
 	if path[0] != '/' {
 		panic("path must begin with '/' in path '" + path + "'")
 	}
@@ -209,10 +211,10 @@ func (r *Router) HandlerFunc(method, path string, handlerFunc http.HandlerFunc) 
 	root.addRoute(path, handlerFunc)
 }
 
-// Handler is an adapter which allows the usage of an http.Handler as a
+// Handle is an adapter which allows the usage of an http.Handler as a
 // request handle.
-func (r *Router) Handler(method, path string, handler http.Handler) {
-	r.HandlerFunc(method, path, handler.ServeHTTP)
+func (r *Router) Handle(method, path string, handler http.Handler) {
+	r.HandleFunc(method, path, handler.ServeHTTP)
 }
 
 // ServeFiles serves files from the given file system root.

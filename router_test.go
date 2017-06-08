@@ -1,8 +1,10 @@
-// Copyright 2013 Julien Schmidt. All rights reserved.
+// Copyright 2017 Jave Tann. All rights reserved.
+// Based on the copyright 2013 Julien Schmidt. All rights reserved.
+// Based on the path package, Copyright 2009 The Go Authors.
 // Use of this source code is governed by a BSD-style license that can be found
 // in the LICENSE file.
 
-package nimux
+package gomux
 
 import (
 	"errors"
@@ -49,7 +51,7 @@ func TestRouter(t *testing.T) {
 	router := New()
 
 	routed := false
-	router.HandlerFunc("GET", "/user/:name", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("GET", "/user/:name", func(w http.ResponseWriter, r *http.Request) {
 		ps := GetMuxParams(r)
 		routed = true
 		want := &Params{Param{"name", "gopher"}}
@@ -103,8 +105,8 @@ func TestRouterAPI(t *testing.T) {
 	router.DELETE("/DELETE", func(w http.ResponseWriter, r *http.Request) {
 		delete = true
 	})
-	router.Handler("GET", "/Handler", httpHandler)
-	router.HandlerFunc("GET", "/HandlerFunc", func(w http.ResponseWriter, r *http.Request) {
+	router.Handle("GET", "/Handler", httpHandler)
+	router.HandleFunc("GET", "/HandlerFunc", func(w http.ResponseWriter, r *http.Request) {
 		handlerFunc = true
 	})
 
@@ -429,7 +431,7 @@ func TestRouterPanicHandler(t *testing.T) {
 		panicHandled = true
 	}
 
-	router.HandlerFunc("PUT", "/user/:name", func(_ http.ResponseWriter, _ *http.Request) {
+	router.HandleFunc("PUT", "/user/:name", func(_ http.ResponseWriter, _ *http.Request) {
 		panic("oops!")
 	})
 

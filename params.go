@@ -1,4 +1,10 @@
-package nimux
+// Copyright 2017 Jave Tann. All rights reserved.
+// Based on the copyright 2013 Julien Schmidt. All rights reserved.
+// Based on the path package, Copyright 2009 The Go Authors.
+// Use of this source code is governed by a BSD-style license that can be found
+// in the LICENSE file.
+
+package gomux
 
 /*
  Temporary use of gorilla/context until Go1.7 is out
